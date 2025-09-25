@@ -1,0 +1,9 @@
+services:
+  service:
+    container_name: ct-to-terraform
+    image: node:24.3-alpine
+    working_dir: /usr/app
+    tty: true
+    command: npm run dev
+    volumes:
+      - ./:/usr/app

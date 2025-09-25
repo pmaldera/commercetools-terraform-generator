@@ -1,0 +1,6 @@
+node_modules/
+dist/
+custom_types/
+output/
+package-lock.json
+.env

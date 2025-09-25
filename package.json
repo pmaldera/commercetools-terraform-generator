@@ -1,0 +1,20 @@
+{
+  "name": "commercetools-terraform-generator",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/pmaldera/commercetools-terraform-generator"
+  },
+  "license": "MIT",
+  "scripts": {
+    "dev": "npm i && npx tsc --watch",
+    "generate": "node --env-file-if-exists=./.env ./dist/cli/index.js"
+  },
+  "dependencies": {
+    "@commercetools/platform-sdk": "^8.16.0",
+    "@commercetools/ts-client": "^4.2.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "@types/node": "24.3.1"
+  }
+}
