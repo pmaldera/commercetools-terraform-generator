@@ -1,7 +1,7 @@
 import { ApiRoot, ByProjectKeyRequestBuilder, ByProjectKeyTypesRequestBuilder, ReferenceTypeId } from "@commercetools/platform-sdk";
 import { createApiRoot } from "../commercetools/client";
 import { computeType } from "../transfomers/type";
-import { existsSync, mkdirSync } from "node:fs"
+import { existsSync, mkdirSync, PathLike } from "node:fs"
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { info, error } from "node:console";
@@ -41,8 +41,22 @@ interface CtConfig {
 
 type ResourceRequestBuilder = ByProjectKeyTypesRequestBuilder
 
+function createFolderIfNotExists(path: PathLike) {
+    if (!existsSync(path)) {
+        try {
+            info(`Dir ${path} doesn't exist, creating it.`)
+            mkdirSync(path)
+        } catch (e) {
+            error(`Couldn't create the output directory ${path}`)
+            throw e
+        }
+    }
+}
+
 export async function importFromCT(config: Config) {
     const apiRoot: ApiRoot = createApiRoot(config.commercetools.authMiddlewareOptions, config.commercetools.httpOptions, config.commercetools.enableLogs)
+
+    createFolderIfNotExists(config.import.outputDir)
 
     let requestBuilder: ByProjectKeyRequestBuilder = apiRoot.withProjectKey({ projectKey: config.commercetools.authMiddlewareOptions.projectKey })
 
@@ -73,15 +87,7 @@ async function importResource(importConfig: GeneratorConfig, requestBuilder: Res
 
     info(`Importing "${resourceName}" resources and generating corresponding files in ${outputDir}`)
 
-    if (!existsSync(outputDir)) {
-        try {
-            info(`Output dir ${outputDir} doesn't exist, creating it.`)
-            mkdirSync(outputDir)
-        } catch (e) {
-            error(`Couldn't create the output directory ${outputDir}`)
-            throw e
-        }
-    }
+    createFolderIfNotExists(outputDir)
 
     /* Gathering all resources following Commercetools documentation advices:
        https://docs.commercetools.com/api/general-concepts#iterate-over-all-elements */

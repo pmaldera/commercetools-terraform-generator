@@ -3,9 +3,10 @@
 **A CLI tool to generate Terraform Configuration files from existing Commercetools projects.**
 
 ## Usage
-1. Use the different env values to configure the generator (see [Configuration](#configuration)). If a .env is provided it will be used.
-2. Run `npm run generate`.
-3. You can now use the generated `.tf` files from the output directory in your IaC setup using [the labd commercetools terraform provider](https://registry.terraform.io/providers/labd/commercetools/latest/).
+1. `npm i commercetools-terraform-generator`
+2. Use the different env values to configure the generator (see [Configuration](#configuration)). If a .env is provided at the root of your project it will be used.
+3. Run `npx commercetools-terraform-generator`.
+4. You can now use the generated `.tf` files from the output directory in your IaC setup using [the labd commercetools terraform provider](https://registry.terraform.io/providers/labd/commercetools/latest/).
 
 ## Configuration
 
@@ -26,7 +27,7 @@ Example:
 The directory to generate the Terraform `.tf` files.
 
 Examples:
-- `"./output"`
+- `"output"`
 - `"/home/user/terraform_files/"`
 
 ### `CTP_AUTH_URL` - required

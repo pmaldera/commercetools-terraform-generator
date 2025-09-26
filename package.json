@@ -1,17 +1,38 @@
 {
   "name": "commercetools-terraform-generator",
-  "version": "1.0.0",
+  "version": "1.0.3",
+  "description": "A CLI tool to generate Terraform Configuration files from existing Commercetools projects.",
+  "keywords": [
+    "commercetools",
+    "terraform",
+    "generator",
+    "iac",
+    "labd",
+    "provider"
+  ],
+  "homepage": "https://github.com/pmaldera/commercetools-terraform-generator#readme",
+  "bugs": {
+    "url": "https://github.com/pmaldera/commercetools-terraform-generator/issues"
+  },
   "repository": {
-    "url": "https://github.com/pmaldera/commercetools-terraform-generator"
+    "type": "git",
+    "url": "git+https://github.com/pmaldera/commercetools-terraform-generator.git"
   },
   "license": "MIT",
+  "author": "Pierre Maldera",
+  "type": "commonjs",
+  "files": [
+    "dist/**/*.js"
+  ],
   "scripts": {
     "dev": "npm i && npx tsc --watch",
-    "generate": "node --env-file-if-exists=./.env ./dist/cli/index.js"
+    "generate": "dist/cli/index.js"
   },
+  "bin": "dist/cli/index.js",
   "dependencies": {
     "@commercetools/platform-sdk": "^8.16.0",
-    "@commercetools/ts-client": "^4.2.1"
+    "@commercetools/ts-client": "^4.2.1",
+    "dotenv": "^17.2.2"
   },
   "devDependencies": {
     "typescript": "^5.9.2",

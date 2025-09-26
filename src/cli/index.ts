@@ -1,6 +1,8 @@
+#!/usr/bin/env node
 import { info, error } from "node:console";
 import { getConfig } from "./cli";
 import { Config, importFromCT } from "./import";
+import "dotenv/config"
 
 (async () => {
     try {
