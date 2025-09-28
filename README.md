@@ -16,6 +16,7 @@ Values should correspond to at least one of the resources of [labd commercetools
 
 Supported values:
 - `"type"`: [Commercetools Types](https://docs.commercetools.com/api/projects/types)
+- `"tax_category"`: [Commercetools tax category](https://docs.commercetools.com/api/projects/taxCategories) including their [tax rates](https://docs.commercetools.com/api/projects/taxCategories#taxrate) and [sub rates](https://docs.commercetools.com/api/projects/taxCategories#subrate)
 - `"all"`: All of the supported values above.
 
 Example: 
@@ -50,12 +51,12 @@ Specifies the Commercetools API Client secret to use, more info in [the HTTP API
 Specifies the Commercetools project you want to import the resources from.
 
 ### `CTP_SCOPES` - optional
-Specifies the [scopes](https://docs.commercetools.com/api/scopes) you want to use, separated by commas.
+Specifies the [scopes](https://docs.commercetools.com/api/scopes) you want to use, separated by spaces.
 If not specified all scopes defined for the API Client will be used.
 
 Examples:
 - `"manage_types:myproject`
-- `"manage_types:myproject,manage_tax_categories:myproject"`
+- `"manage_types:myproject manage_tax_categories:myproject"`
 
 ### `ENABLE_CTP_LOGS` - optional
 Specifies the Commercetools logger should be used.
@@ -63,6 +64,7 @@ Specifies the Commercetools logger should be used.
 Supported values: `"true"` or `"false"`. `"false"` if not specified.
 
 ## Todolist
+- Generate terraform's `import` commands to facilitate [state import](https://registry.terraform.io/providers/labd/commercetools/latest/docs/guides/state-import).
 - Create tests to ensure compatibility with upcoming updates.
 - Create a docker image from [the labd image](https://github.com/labd/terraform-provider-commercetools/blob/main/Dockerfile) to bundle this lib and the provider together so it's ready to be used OOTB.
 - Support all types supported by [the labd commercetools terraform provider](https://registry.terraform.io/providers/labd/commercetools/latest/).

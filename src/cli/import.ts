@@ -1,4 +1,4 @@
-import { ApiRoot, ByProjectKeyRequestBuilder, ByProjectKeyTypesRequestBuilder, ReferenceTypeId } from "@commercetools/platform-sdk";
+import { ApiRoot, ByProjectKeyRequestBuilder, ByProjectKeyTaxCategoriesRequestBuilder, ByProjectKeyTypesRequestBuilder } from "@commercetools/platform-sdk";
 import { createApiRoot } from "../commercetools/client";
 import { computeType } from "../transfomers/type";
 import { existsSync, mkdirSync, PathLike } from "node:fs"
@@ -6,13 +6,15 @@ import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { info, error } from "node:console";
 import { AuthMiddlewareOptions, HttpMiddlewareOptions } from "@commercetools/ts-client";
+import { computeTaxCategory } from "../transfomers/tax_category";
 
 export enum Resources {
     Type = 'type',
+    TaxCategory = 'tax_category',
     All = 'all'
 }
 
-export const AllowedResources: string[] = [Resources.Type, Resources.All]
+export const AllowedResources: string[] = [Resources.Type, Resources.TaxCategory, Resources.All]
 
 export interface Config {
     import: GeneratorConfig,
@@ -39,7 +41,7 @@ interface CtConfig {
     enableLogs: boolean
 }
 
-type ResourceRequestBuilder = ByProjectKeyTypesRequestBuilder
+type ResourceRequestBuilder = ByProjectKeyTypesRequestBuilder | ByProjectKeyTaxCategoriesRequestBuilder
 
 function createFolderIfNotExists(path: PathLike) {
     if (!existsSync(path)) {
@@ -65,8 +67,12 @@ export async function importFromCT(config: Config) {
             case Resources.Type:
                 await importResource(config.import, requestBuilder.types(), computeType, resource)
                 break
+            case Resources.TaxCategory:
+                await importResource(config.import, requestBuilder.taxCategories(), computeTaxCategory, Resources.TaxCategory)
+                break
             case Resources.All:
                 await importResource(config.import, requestBuilder.types(), computeType, Resources.Type)
+                await importResource(config.import, requestBuilder.taxCategories(), computeTaxCategory, Resources.TaxCategory)
                 // @todo add other importResource calls when more resource are supported.
                 break
         }

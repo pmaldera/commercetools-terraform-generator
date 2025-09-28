@@ -1,5 +1,5 @@
 import { FieldDefinition, Type, FieldType, CustomFieldEnumValue, CustomFieldLocalizedEnumValue, LocalizedString } from "@commercetools/platform-sdk"
-import { computeBoolean, computeString, computeStringList } from "./common"
+import { computeBoolean, computeString, computeStringList, ResourceNames } from "./common"
 
 enum CTTypeName {
     Boolean = "Boolean",
@@ -14,8 +14,6 @@ enum CTTypeName {
     Enum = "Enum",
     LocalizedEnum = "LocalizedEnum"
 }
-
-const resourceName = 'commercetools_type'
 
 enum ResourceProperties {
     Key = 'key',
@@ -53,7 +51,7 @@ enum LocalizedEnumValueProperties {
 
 
 export function computeType(obj: Type, tab: string): string {
-    let toWrite = `resource "${resourceName}" "${obj.key}" {\n`
+    let toWrite = `resource "${ResourceNames.Type}" "${obj.key}" {\n`
     toWrite += computeString(ResourceProperties.Key, obj.key, 1, tab)
     toWrite += typeFunctions.computeLocalizedString(ResourceProperties.Name, obj.name, 1, tab)
     toWrite += typeFunctions.computeLocalizedString(ResourceProperties.Description, obj.description, 1, tab)

@@ -1,6 +1,6 @@
 {
   "name": "commercetools-terraform-generator",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "description": "A CLI tool to generate Terraform Configuration files from existing Commercetools projects.",
   "keywords": [
     "commercetools",

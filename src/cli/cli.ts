@@ -22,7 +22,7 @@ export async function getConfig(): Promise<Config> {
         throw Error(`Invalid ${EnvVariable.CtpEnableLogs} env variable value. Use either "true" or "false". Not providing this env variable will disable Commercetools logs.`)
     }
 
-    const ctpScopes = process.env[EnvVariable.CtpScopes]?.trim()?.split(',')
+    const ctpScopes = process.env[EnvVariable.CtpScopes]?.trim()?.split(' ')
 
     if (!process.env[EnvVariable.OutputDir]) { throw Error(`Missing output directory. Did you forget to provide the ${EnvVariable.OutputDir} env variable ?`) }
     if (!process.env[EnvVariable.ImportResource]) {
