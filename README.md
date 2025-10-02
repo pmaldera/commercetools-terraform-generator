@@ -69,11 +69,11 @@ Specifies if the generated terraform configuration files should be grouped in re
 Supported values: `"true"` or `"false"`. `"false"` if not specified, meaning all files will be generated in the directory specified by `OUTPUT_DIR`.
 
 ## "All included" docker folder
-The ̀`docker` folder in [this package's github repository](https://github.com/pmaldera/commercetools-terraform-generator) contains the docker compose file and the `provider.tf` to run both this npm package and [the labd commercetools terraform provider](https://registry.terraform.io/providers/labd/commercetools/latest/) with terraform in a docker image.
+The `docker` folder in [this package's github repository](https://github.com/pmaldera/commercetools-terraform-generator) contains the docker compose file and the `provider.tf` to run both this npm package and [the labd commercetools terraform provider](https://registry.terraform.io/providers/labd/commercetools/latest/) with terraform in a docker image.
 
 1. Add your `.env` file in the folder.
 2. Install the npm package and init terraform: `docker compose up`
-3. Generate the terraform configuration files: `sudo docker compose run --rm npx commercetools-terraform-generator`
+3. Generate the terraform configuration files: `sudo docker compose run --rm generator npx commercetools-terraform-generator`
 4. Plan terraform changes: `docker compose run --rm terraform plan`
 5. Apply the changes: `docker compose run --rm terraform apply`
 
