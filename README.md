@@ -55,7 +55,7 @@ Specifies the [scopes](https://docs.commercetools.com/api/scopes) you want to us
 If not specified all scopes defined for the API Client will be used.
 
 Examples:
-- `"manage_types:myproject`
+- `"manage_types:myproject"`
 - `"manage_types:myproject manage_tax_categories:myproject"`
 
 ### `ENABLE_CTP_LOGS` - optional
