@@ -2,6 +2,7 @@ import { AllowedResources, Config, Resources } from "./import";
 
 export enum EnvVariable {
     ImportResource = 'IMPORT_RESOURCE',
+    SeparateResources = "SEPERATE_RESOURCES",
     OutputDir = 'OUTPUT_DIR',
     CtpEnableLogs = 'CTP_ENABLE_LOGS',
     CtpAuthUrl = 'CTP_AUTH_URL',
@@ -20,6 +21,9 @@ export async function getConfig(): Promise<Config> {
     if (!process.env[EnvVariable.CtpAuthUrl]) { throw Error(`Missing Commercetools Client Auth URL. Did you forget to provide the ${EnvVariable.CtpAuthUrl} env variable ?`) }
     if (process.env[EnvVariable.CtpEnableLogs] && !['true', 'false'].includes(process.env[EnvVariable.CtpEnableLogs])) {
         throw Error(`Invalid ${EnvVariable.CtpEnableLogs} env variable value. Use either "true" or "false". Not providing this env variable will disable Commercetools logs.`)
+    }
+    if (process.env[EnvVariable.SeparateResources] && !['true', 'false'].includes(process.env[EnvVariable.SeparateResources])) {
+        throw Error(`Invalid ${EnvVariable.SeparateResources} env variable value. Use either "true" or "false". Not providing this env variable will generate .tf files in a different folder for each resource type.`)
     }
 
     const ctpScopes = process.env[EnvVariable.CtpScopes]?.trim()?.split(' ')
@@ -40,6 +44,7 @@ export async function getConfig(): Promise<Config> {
         import: {
             resource: new Set((resources as Resources[])),
             outputDir: process.env[EnvVariable.OutputDir],
+            separateResources: process.env[EnvVariable.SeparateResources] === "true"
         },
         commercetools: {
             authMiddlewareOptions: {
@@ -49,7 +54,7 @@ export async function getConfig(): Promise<Config> {
                     clientId: process.env[EnvVariable.CtpClientId],
                     clientSecret: process.env[EnvVariable.CtpClientSecret]
                 },
-                ctpScopes
+                scopes: ctpScopes
             },
             httpOptions: {
                 host: process.env[EnvVariable.CtpApiUrl]

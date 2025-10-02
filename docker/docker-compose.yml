@@ -1,11 +1,9 @@
-# Used for dev
 services:
   generator:
     container_name: ct-to-terraform
     image: node:24.3-alpine
     working_dir: /usr/app
-    tty: true
-    command: npm run dev
+    command: npm i commercetools-terraform-generator
     volumes:
       - ./:/usr/app
       - ./${OUTPUT_DIR}:/terraform
@@ -13,6 +11,8 @@ services:
     container_name: terraform
     image: hashicorp/terraform:latest
     working_dir: /terraform
-    tty: true
+    command: init
     volumes:
     - ./${OUTPUT_DIR}:/terraform
+    depends_on: 
+      - generator

@@ -24,11 +24,11 @@ enum SubRateProperties {
 }
 
 export function computeTaxCategoryRate(obj: TaxRate, tab: string): string {
-    let toWrite = `resource "${ResourceNames.TaxCategoryRate}" "${obj.name}" {\n`
-    toWrite += computeString(TaxCategoryRateProperties.Country, obj.key, 1, tab)
+    let toWrite = `resource "${ResourceNames.TaxCategoryRate}" "${obj.key}" {\n`
     toWrite += computeBoolean(TaxCategoryRateProperties.IncludedInPrice, obj.includedInPrice, 1, tab)
     toWrite += computeString(TaxCategoryRateProperties.TaxCategoryId, obj.id, 1, tab)
     toWrite += computeString(TaxCategoryRateProperties.Name, obj.name, 1, tab)
+    toWrite += computeString(TaxCategoryRateProperties.Country, obj.country, 1, tab)
 
     for (const subRate of obj.subRates) {
         toWrite += computeSubRate(subRate, 1, tab)

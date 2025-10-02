@@ -1,12 +1,12 @@
 import { ApiRoot, ByProjectKeyRequestBuilder, ByProjectKeyTaxCategoriesRequestBuilder, ByProjectKeyTypesRequestBuilder } from "@commercetools/platform-sdk";
 import { createApiRoot } from "../commercetools/client";
-import { computeType } from "../transfomers/type";
+import { computeType } from "../terraform/transfomers/type";
 import { existsSync, mkdirSync, PathLike } from "node:fs"
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { info, error } from "node:console";
 import { AuthMiddlewareOptions, HttpMiddlewareOptions } from "@commercetools/ts-client";
-import { computeTaxCategory } from "../transfomers/tax_category";
+import { computeTaxCategory } from "../terraform/transfomers/tax_category";
 
 export enum Resources {
     Type = 'type',
@@ -32,7 +32,8 @@ const CONSTANTS = {
 
 interface GeneratorConfig {
     resource: Set<Resources>,
-    outputDir: string
+    outputDir: string,
+    separateResources: boolean
 }
 
 interface CtConfig {
@@ -80,15 +81,20 @@ export async function importFromCT(config: Config) {
 }
 
 async function importResource(importConfig: GeneratorConfig, requestBuilder: ResourceRequestBuilder, tranformerFn: Function, resourceName: string) {
-    const outputDir = path.join(importConfig.outputDir, `/${resourceName}/`)
-    const limit = CONSTANTS.commercetools.queryMaxLimit
+    let outputDir;
     let lastId = null
     let lastSize = 0
 
     let queryArgs = {
-        limit: limit,
+        limit: CONSTANTS.commercetools.queryMaxLimit,
         sort: 'id asc',
         where: undefined
+    }
+
+    if(importConfig.separateResources) {
+        outputDir = path.join(importConfig.outputDir, `/${resourceName}/`)
+    } else {
+        outputDir = importConfig.outputDir
     }
 
     info(`Importing "${resourceName}" resources and generating corresponding files in ${outputDir}`)
@@ -120,5 +126,17 @@ async function importResource(importConfig: GeneratorConfig, requestBuilder: Res
         lastSize = response.body.results.length
         lastId = response.body.results.at(lastSize - 1).id
 
-    } while (lastSize === limit)
+    } while (lastSize === queryArgs.limit)
+}
+
+function computeProviderBlock(config: CtConfig) {
+    return (
+    `provider "commercetools" {
+        client_id     = "${config.authMiddlewareOptions.credentials.clientId}"
+        client_secret = "${config.authMiddlewareOptions.credentials.clientSecret}"
+        project_key   = "${config.authMiddlewareOptions.projectKey}"
+        scopes        = "${config.authMiddlewareOptions.scopes}"
+        api_url       = "${config.httpOptions.host}"
+        token_url     = "${config.authMiddlewareOptions.host.replace('https://', `https://${config.authMiddlewareOptions.credentials.clientId}:${config.authMiddlewareOptions.credentials.clientSecret}@`)}"
+}`)
 }

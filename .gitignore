@@ -2,5 +2,8 @@ node_modules/
 dist/
 custom_types/
 output/
-package-lock.json
+docker/package.json
+.terraform/
 .env
+.terraform.lock.hcl
+package-lock.json
