@@ -43,6 +43,7 @@ interface CtConfig {
 }
 
 type ResourceRequestBuilder = ByProjectKeyTypesRequestBuilder | ByProjectKeyTaxCategoriesRequestBuilder
+type transformerFunction = (obj: object, tab: string) => string;
 
 function createFolderIfNotExists(path: PathLike) {
     if (!existsSync(path)) {
@@ -61,7 +62,7 @@ export async function importFromCT(config: Config) {
 
     createFolderIfNotExists(config.import.outputDir)
 
-    let requestBuilder: ByProjectKeyRequestBuilder = apiRoot.withProjectKey({ projectKey: config.commercetools.authMiddlewareOptions.projectKey })
+    const requestBuilder: ByProjectKeyRequestBuilder = apiRoot.withProjectKey({ projectKey: config.commercetools.authMiddlewareOptions.projectKey })
 
     for (const resource of config.import.resource) {
         switch (resource) {
@@ -80,12 +81,12 @@ export async function importFromCT(config: Config) {
     }
 }
 
-async function importResource(importConfig: GeneratorConfig, requestBuilder: ResourceRequestBuilder, tranformerFn: Function, resourceName: string) {
+async function importResource(importConfig: GeneratorConfig, requestBuilder: ResourceRequestBuilder, tranformerFn: transformerFunction, resourceName: string) {
     let outputDir;
     let lastId = null
     let lastSize = 0
 
-    let queryArgs = {
+    const queryArgs = {
         limit: CONSTANTS.commercetools.queryMaxLimit,
         sort: 'id asc',
         where: undefined
@@ -127,16 +128,4 @@ async function importResource(importConfig: GeneratorConfig, requestBuilder: Res
         lastId = response.body.results.at(lastSize - 1).id
 
     } while (lastSize === queryArgs.limit)
-}
-
-function computeProviderBlock(config: CtConfig) {
-    return (
-    `provider "commercetools" {
-        client_id     = "${config.authMiddlewareOptions.credentials.clientId}"
-        client_secret = "${config.authMiddlewareOptions.credentials.clientSecret}"
-        project_key   = "${config.authMiddlewareOptions.projectKey}"
-        scopes        = "${config.authMiddlewareOptions.scopes}"
-        api_url       = "${config.httpOptions.host}"
-        token_url     = "${config.authMiddlewareOptions.host.replace('https://', `https://${config.authMiddlewareOptions.credentials.clientId}:${config.authMiddlewareOptions.credentials.clientSecret}@`)}"
-}`)
 }
