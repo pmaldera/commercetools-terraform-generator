@@ -1,4 +1,4 @@
-import { ApiRoot, ByProjectKeyRequestBuilder, ByProjectKeyTaxCategoriesRequestBuilder, ByProjectKeyTypesRequestBuilder } from "@commercetools/platform-sdk";
+import { ApiRoot, ByProjectKeyChannelsRequestBuilder, ByProjectKeyRequestBuilder, ByProjectKeyTaxCategoriesRequestBuilder, ByProjectKeyTypesRequestBuilder } from "@commercetools/platform-sdk";
 import { createApiRoot } from "../commercetools/client";
 import { computeType } from "../terraform/transfomers/type";
 import { existsSync, mkdirSync, PathLike } from "node:fs"
@@ -7,14 +7,16 @@ import path from "node:path";
 import { info, error } from "node:console";
 import { AuthMiddlewareOptions, HttpMiddlewareOptions } from "@commercetools/ts-client";
 import { computeTaxCategory } from "../terraform/transfomers/tax_category";
+import { computeChannel } from "../terraform/transfomers/channel";
 
 export enum Resources {
+    Channel = 'channel',
     Type = 'type',
     TaxCategory = 'tax_category',
     All = 'all'
 }
 
-export const AllowedResources: string[] = [Resources.Type, Resources.TaxCategory, Resources.All]
+export const AllowedResources: string[] = [Resources.Channel, Resources.Type, Resources.TaxCategory, Resources.All]
 
 export interface Config {
     import: GeneratorConfig,
@@ -30,10 +32,12 @@ const CONSTANTS = {
     }
 }
 
-interface GeneratorConfig {
+export interface GeneratorConfig {
     resource: Set<Resources>,
     outputDir: string,
-    separateResources: boolean
+    separateResources: boolean,
+    sanitizeResourceLabels: boolean,
+    indentation: string
 }
 
 interface CtConfig {
@@ -42,8 +46,8 @@ interface CtConfig {
     enableLogs: boolean
 }
 
-type ResourceRequestBuilder = ByProjectKeyTypesRequestBuilder | ByProjectKeyTaxCategoriesRequestBuilder
-type transformerFunction = (obj: object, tab: string) => string;
+type ResourceRequestBuilder = ByProjectKeyTypesRequestBuilder | ByProjectKeyTaxCategoriesRequestBuilder | ByProjectKeyChannelsRequestBuilder
+type transformerFunction = (obj: object, config: GeneratorConfig) => string;
 
 function createFolderIfNotExists(path: PathLike) {
     if (!existsSync(path)) {
@@ -72,9 +76,13 @@ export async function importFromCT(config: Config) {
             case Resources.TaxCategory:
                 await importResource(config.import, requestBuilder.taxCategories(), computeTaxCategory, Resources.TaxCategory)
                 break
+            case Resources.Channel:
+                await importResource(config.import, requestBuilder.channels(), computeChannel, Resources.Channel)
+                break
             case Resources.All:
                 await importResource(config.import, requestBuilder.types(), computeType, Resources.Type)
                 await importResource(config.import, requestBuilder.taxCategories(), computeTaxCategory, Resources.TaxCategory)
+                await importResource(config.import, requestBuilder.channels(), computeChannel, Resources.Channel)
                 // @todo add other importResource calls when more resource are supported.
                 break
         }
@@ -118,7 +126,7 @@ async function importResource(importConfig: GeneratorConfig, requestBuilder: Res
                 const outputFilePath = path.join(outputDir, `${t.key}.tf`)
                 await writeFile(
                     outputFilePath,
-                    tranformerFn(t, CONSTANTS.generator.defaultTab),
+                    tranformerFn(t, importConfig),
                     { flag: 'w' }
                 ).catch(err => error(`Error will writing file ${outputFilePath}: ${err}`))
             })

@@ -1,5 +1,7 @@
 import { FieldDefinition, Type, FieldType, CustomFieldEnumValue, CustomFieldLocalizedEnumValue, LocalizedString } from "@commercetools/platform-sdk"
-import { computeBoolean, computeString, computeStringList, ResourceNames } from "./common"
+import { computeBoolean, computeLocalizedString, computeString, computeStringList, ResourceNames } from "./common"
+import { GeneratorConfig } from "../../cli/import"
+import { sanitizeResourceLabel } from "../utils"
 
 enum CTTypeName {
     Boolean = "Boolean",
@@ -50,35 +52,22 @@ enum LocalizedEnumValueProperties {
 }
 
 
-export function computeType(obj: Type, tab: string): string {
-    let toWrite = `resource "${ResourceNames.Type}" "${obj.key}" {\n`
-    toWrite += computeString(ResourceProperties.Key, obj.key, 1, tab)
-    toWrite += typeFunctions.computeLocalizedString(ResourceProperties.Name, obj.name, 1, tab)
-    toWrite += typeFunctions.computeLocalizedString(ResourceProperties.Description, obj.description, 1, tab)
-    toWrite += computeStringList(ResourceProperties.ResourceTypeIds, obj.resourceTypeIds, 1, tab)
+export function computeType(obj: Type, config: GeneratorConfig): string {
+    let toWrite = `resource "${ResourceNames.Type}" "${sanitizeResourceLabel(obj.key, config.sanitizeResourceLabels)}" {\n`
+    toWrite += computeString(ResourceProperties.Key, obj.key, 1, config.indentation)
+    toWrite += computeLocalizedString(ResourceProperties.Name, obj.name, 1, config.indentation)
+    toWrite += computeLocalizedString(ResourceProperties.Description, obj.description, 1, config.indentation)
+    toWrite += computeStringList(ResourceProperties.ResourceTypeIds, obj.resourceTypeIds, 1, config.indentation)
     toWrite += `\n`
 
     for (const field of obj.fieldDefinitions) {
-        toWrite += fieldFunctions.computeField(field, 1, tab)
+        toWrite += fieldFunctions.computeField(field, 1, config.indentation)
     }
-
 
     toWrite += '}'
     return toWrite;
 }
 
-const typeFunctions = {
-    computeLocalizedString: function(name: string, obj: LocalizedString, level: number, tab) {
-        if(!obj) return ''
-        let toWrite = `${tab.repeat(level)}${name} = {\n`
-        for(const prop in obj) {
-            toWrite += `${tab.repeat(level + 1)}${prop} = "${obj[prop]}"\n`
-        }
-        toWrite += `${tab.repeat(level)}}\n`
-
-        return toWrite
-    },
-}
 
 const fieldFunctions = {
     computeStringMap: function(name: string, obj: LocalizedString, level: number, tab: string) {

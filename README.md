@@ -15,8 +15,9 @@ The resources to import from the commercetools project and transform into terraf
 Values should correspond to at least one of the resources of [labd commercetools terraform provider](https://registry.terraform.io/providers/labd/commercetools/latest/docs).
 
 Supported values:
-- `"type"`: [Commercetools Types](https://docs.commercetools.com/api/projects/types)
-- `"tax_category"`: [Commercetools tax category](https://docs.commercetools.com/api/projects/taxCategories) including their [tax rates](https://docs.commercetools.com/api/projects/taxCategories#taxrate) and [sub rates](https://docs.commercetools.com/api/projects/taxCategories#subrate)
+- `"channel"`: [Commercetools channels](https://docs.commercetools.com/api/projects/channels) - resource name will be the channel's key.
+- `"type"`: [Commercetools Types](https://docs.commercetools.com/api/projects/types) - resource name will be the type's key
+- `"tax_category"`: [Commercetools tax category](https://docs.commercetools.com/api/projects/taxCategories) including their [tax rates](https://docs.commercetools.com/api/projects/taxCategories#taxrate) and [sub rates](https://docs.commercetools.com/api/projects/taxCategories#subrate) - resource name will be the category's key and the tax rate's id (subrate don't have any unique identifier.)
 - `"all"`: All of the supported values above.
 
 Example: 
@@ -67,6 +68,11 @@ Supported values: `"true"` or `"false"`. `"false"` if not specified.
 Specifies if the generated terraform configuration files should be grouped in resource type folder.
 
 Supported values: `"true"` or `"false"`. `"false"` if not specified, meaning all files will be generated in the directory specified by `OUTPUT_DIR`.
+
+### `SANITIZE_RESOURCES_LABELS` - optional
+Specifies if the data used to generate resources' [labels](https://developer.hashicorp.com/terraform/language/block/resource#label) should be sanitized.
+Enabling this parameter makes sure a resource name/label starts with a letter or underscore (by adding an underscore to the value used for the label if the rule is not respected) and it contains only letters, digits, underscores and dashes (by replacing any character not respecting the rule by a dash).
+Supported values: `"true"` or `"false"`. `"false"` if not specified, meaning characters which are not letters, digits, underscores or dashes won't be replaced by a dash (`-`).
 
 ## "All included" docker folder
 The `docker` folder in [this package's github repository](https://github.com/pmaldera/commercetools-terraform-generator) contains the docker compose file and the `provider.tf` to run both this npm package and [the labd commercetools terraform provider](https://registry.terraform.io/providers/labd/commercetools/latest/) with terraform in a docker image.

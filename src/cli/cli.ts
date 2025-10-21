@@ -3,6 +3,7 @@ import { AllowedResources, Config, Resources } from "./import";
 export enum EnvVariable {
     ImportResource = 'IMPORT_RESOURCE',
     SeparateResources = "SEPERATE_RESOURCES",
+    SanitizeResourceLabels = "SANITIZE_RESOURCES_LABELS",
     OutputDir = 'OUTPUT_DIR',
     CtpEnableLogs = 'CTP_ENABLE_LOGS',
     CtpAuthUrl = 'CTP_AUTH_URL',
@@ -25,6 +26,9 @@ export async function getConfig(): Promise<Config> {
     if (process.env[EnvVariable.SeparateResources] && !['true', 'false'].includes(process.env[EnvVariable.SeparateResources])) {
         throw Error(`Invalid ${EnvVariable.SeparateResources} env variable value. Use either "true" or "false". Not providing this env variable will generate .tf files in a different folder for each resource type.`)
     }
+    if (process.env[EnvVariable.SanitizeResourceLabels] && !['true', 'false'].includes(process.env[EnvVariable.SanitizeResourceLabels])) {
+        throw Error(`Invalid ${EnvVariable.SeparateResources} env variable value. Use either "true" or "false". Not providing this env variable will generate .tf files in a different folder for each resource type.`)
+    }
 
     const ctpScopes = process.env[EnvVariable.CtpScopes]?.trim()?.split(' ')
 
@@ -40,11 +44,13 @@ export async function getConfig(): Promise<Config> {
 
 
 
-    const config = {
+    const config: Config = {
         import: {
             resource: new Set((resources as Resources[])),
             outputDir: process.env[EnvVariable.OutputDir],
-            separateResources: process.env[EnvVariable.SeparateResources] === "true"
+            separateResources: process.env[EnvVariable.SeparateResources] === "true",
+            sanitizeResourceLabels: process.env[EnvVariable.SanitizeResourceLabels] === "true",
+            indentation: ' '
         },
         commercetools: {
             authMiddlewareOptions: {
